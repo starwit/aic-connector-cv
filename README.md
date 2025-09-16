@@ -1,12 +1,19 @@
 # AI Cockpit Connector for Computer Vision
 
-This component sends sae detection results to ai-cockpit and adds images with bounding boxes to ai-cockpits minio bucket.
+This component sends sae detection results to ai-cockpit and adds images with bounding boxes to ai-cockpits minio bucket and creates a new decision for human operators to check.
+
+## Background & Concept
+AI software makes complex decisions and thus it is necessary to keep humans in control. In order to have a central place for this kind of checks [AI Cockpit](https://github.com/starwit/ai-cockpit) was developed. 
+
+To get decisions into cockpit connecting components are necessary and this component connects object detection events to AI Cockpit. Decisions checked here are fairly simple - test if detections are correct. If you want to develop your own connector, this project can serve as a template. 
+
+# Development
+This section contains all info how to setup local development. 
 
 ## Check prerequisites
 In order to work with this repository, you need to ensure the following steps:
 - Install Poetry
-- Install Docker with compose plugin
-- Clone main SAE repository (you will most likely need a running SAE to do anything useful): https://github.com/starwit/starwit-awareness-engine
+- Install Docker
 
 ## Setup
 - Run `poetry install`, this should install all necessary dependencies
