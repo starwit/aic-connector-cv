@@ -2,8 +2,8 @@ import pytest
 
 def test_rediswriter_import():
     try:
-        from mystage.mystage import MyStage
+        from aicconnector.aicconnector import AicConnector
     except ImportError as e:
-        pytest.fail(f"Failed to import MyStage: {e}")
+        pytest.fail(f"Failed to import AicConnector: {e}")
 
-    assert MyStage is not None, "MyStage should be imported successfully"
+    assert AicConnector is not None, "AicConnector should be imported successfully"
