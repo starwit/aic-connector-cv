@@ -48,4 +48,27 @@ class AicConnector:
         return sae_msg.SerializeToString()
 
     def _save_sae_media(self, input_msg: SaeMessage, sae_id: str):
+        frame = input_msg.frame.frame_data_jpeg
+
+        #try:
+            # Create a temporary directory and store all necessary output artifacts
+            #temp_output_dir = Path('./output')
+            #os.makedirs(temp_output_dir, exist_ok=True)
+            #store_annotated_frame(temp_output_dir / 'annotated.jpg', frame, trajectories)
+
+            # Copy output artifacts to local storage
+            #if self.config.local_output is not None:
+            #    shutil.copytree(temp_output_dir, self.config.local_output.path / sae_id, dirs_exist_ok=True)
+            
+            # Upload output artifacts to MinIO if http_output is configured
+            #if self.config.http_output is not None:
+            #    for file in temp_output_dir.iterdir():
+            #        object_name = f"{sae_id}/{file.name}"
+            #        save_file_to_minio(self.config.http_output.minio, file, object_name)
+        #except Exception as e:
+        #    logger.error(f"Error saving anomaly: {e}")
+
+        # Clean up
+        # shutil.rmtree(temp_output_dir, ignore_errors=True)
+
         return

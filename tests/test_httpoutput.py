@@ -29,7 +29,7 @@ def test_create_decision_msg():
     result = http_output._create_decision_msg(msg, 'sae_id')
     assert result is not None
 
-def test_send_decision_message_no_auth(monkeypatch):
+def test_send_decision_message_no_auth():
     config = make_config()
     http_output = HttpOutput(config, LogLevel.INFO)
     msg = DummySaeMessage()
@@ -39,7 +39,7 @@ def test_send_decision_message_no_auth(monkeypatch):
         http_output.send_decision_message(msg, 'sae_id')
         mock_post.assert_called()
 
-def test_send_decision_message_with_auth(monkeypatch):
+def test_send_decision_message_with_auth():
     config = make_config(auth=True)
     http_output = HttpOutput(config, LogLevel.INFO)
     msg = DummySaeMessage()
@@ -49,7 +49,7 @@ def test_send_decision_message_with_auth(monkeypatch):
         http_output.send_decision_message(msg, 'sae_id')
         assert mock_post.call_count == 2
 
-def test_send_decision_message_timeout(monkeypatch):
+def test_send_decision_message_timeout():
     config = make_config()
     http_output = HttpOutput(config, LogLevel.INFO)
     msg = DummySaeMessage()
