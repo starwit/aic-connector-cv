@@ -1,8 +1,25 @@
-log_level: INFO
-redis:
-  host: redis
-  port: 6379
-  stream_id: stream1
-  input_stream_prefix: objecttracker
-  output_stream_prefix: aicconnector
+# Example configuration file for AIC Connector
+log_level: WARNING
 prometheus_port: 8000
+redis_input:                                  # Redis settings for anomaly input (mandatory)
+  host: localhost
+  port: 6379
+  stream_ids: 
+    - stream1
+  stream_prefix: objectdetector
+http_output:                                  # HTTP output settings (disabled if not defined)           
+  target_endpoint: http://localhost:8081/ai-cockpit/api/decision
+  module_name: MODULE_NAME
+  # auth:                                     # HTTP output authentication settings (disabled if not defined)
+  #   token_endpoint_url: TOKEN_URL
+  #   client_id: CLIENT_ID
+  #   username: USERNAME
+  #   password: PASSWORD
+  minio:                                      # MinIO settings for anomaly storage (mandatory for http_o)
+    user: USERNAME
+    password: PASSWORD
+    endpoint: localhost:9000
+    secure: True
+    bucket_name: BUCKET_NAME
+# local_output:                               # Local file output settings (disabled if not defined)
+#   path: /tmp/anomalydetection

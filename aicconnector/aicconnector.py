@@ -1,10 +1,12 @@
 import logging
 from typing import Any
-
+from datetime import datetime
 from prometheus_client import Counter, Histogram, Summary
 from visionapi.sae_pb2 import SaeMessage
-
+from uuid import uuid4
 from .config import AicConnectorConfig
+from .httpoutput import HttpOutput
+
 
 logging.basicConfig(format='%(asctime)s %(name)-15s %(levelname)-8s %(processName)-10s %(message)s')
 logger = logging.getLogger(__name__)
@@ -19,6 +21,8 @@ PROTO_DESERIALIZATION_DURATION = Summary('aic_connector_proto_deserialization_du
 class AicConnector:
     def __init__(self, config: AicConnectorConfig) -> None:
         self.config = config
+        self.http_output = HttpOutput(config.http_output, config.log_level) if config.http_output else None
+        self.isDebug = self.config.log_level.value == 'DEBUG'
         logger.setLevel(self.config.log_level.value)
 
     def __call__(self, input_proto) -> Any:
@@ -26,12 +30,11 @@ class AicConnector:
     
     @GET_DURATION.time()
     def get(self, input_proto):
-        sae_msg = self._unpack_proto(input_proto)
-
-        # Your implementation goes (mostly) here
-        logger.warning('Received SAE message from pipeline')
-
-        return self._pack_proto(sae_msg)
+        sae_msg: SaeMessage = self._unpack_proto(input_proto)
+        sae_id = f'{datetime.now().strftime("%Y%m%d_%H%M%S")}_{uuid4().hex[:6]}'
+        self._save_sae_media(sae_msg, sae_id)
+        if self.http_output:
+            self.http_output.send_decision_message(sae_msg, sae_id)
         
     @PROTO_DESERIALIZATION_DURATION.time()
     def _unpack_proto(self, sae_message_bytes):
@@ -43,3 +46,6 @@ class AicConnector:
     @PROTO_SERIALIZATION_DURATION.time()
     def _pack_proto(self, sae_msg: SaeMessage):
         return sae_msg.SerializeToString()
+
+    def _save_sae_media(self, input_msg: SaeMessage, sae_id: str):
+        return
