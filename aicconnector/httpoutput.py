@@ -2,7 +2,8 @@ import logging
 
 import requests
 from requests.exceptions import HTTPError, RequestException, Timeout
-from starwit_aic_api.models.decision import Decision, Module, DecisionType
+from starwit_aic_api.models.decision import Decision
+from starwit_aic_api.models.module import Module
 from visionapi.sae_pb2 import SaeMessage
 
 from .config import HttpOutputConfig, LogLevel

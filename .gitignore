@@ -6,3 +6,4 @@ cache
 *.pt
 .vscode
 settings.yaml
+output

@@ -1,10 +1,5 @@
-import json
 import logging
-import subprocess
-import time
-import zipfile
 from pathlib import Path
-from zlib import crc32
 
 import cv2
 import numpy as np
