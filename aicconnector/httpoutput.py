@@ -18,7 +18,7 @@ class HttpOutput:
     def send_decision_message(self, sae_msg: SaeMessage, sae_id: str) -> None:
         decision_payload = self._create_decision_msg(sae_msg, sae_id)
 
-        logger.info(f"Sending decision to cockpit: {self.config.target_endpoint}")
+        logger.debug(f"Sending decision to cockpit: {self.config.target_endpoint}")
         logger.debug(f"Decision payload: {decision_payload}")
         try:
             if self.config.auth:
