@@ -2,7 +2,7 @@ nameOverride: "aic-connector-cv"
 fullnameOverride: "aic-connector-cv"
 
 image:
-  repository: docker.internal.starwit-infra.de/aic-connector-cv
+  repository: starwitorg/aic-connector-cv
   # tag: TAG # .Chart.AppVersion is used by default, but can be overridden here
 
 # This section is used verbatim as the settings.yaml for the aic-connector-cv service (see settings.template.yaml for options)

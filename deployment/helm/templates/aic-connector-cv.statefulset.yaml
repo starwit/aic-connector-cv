@@ -1,6 +1,5 @@
 
-{{- $imageRepo := required "image repository for aic-connector-cv is required" .image.repository }}
-{{- $imageTag := required "image tag for aic-connector-cv is required" .image.tag }}
+{{- $imageRepo := required "image repository for aic-connector-cv is required"  .Values.image.repository }}
 {{- $rootConfig := . }}
 {{- with .settingsYaml -}}
 {{- $instanceName := printf "aic-connector-cv" }}
@@ -36,7 +35,7 @@ spec:
         - name: {{ $instanceName }}
           securityContext:
             {{- toYaml $.Values.securityContext | nindent 12 }}
-          image: "{{ $imageRepo }}:{{ $imageTag }}"
+          image: "{{ $imageRepo }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: IfNotPresent
           resources:
             {{- toYaml $.Values.resources | nindent 12 }}
