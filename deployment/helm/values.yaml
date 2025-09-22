@@ -1,13 +1,12 @@
-nameOverride: "anomaly-post-processing"
-fullnameOverride: "anomaly-post-processing"
+nameOverride: "aic-connector-cv"
+fullnameOverride: "aic-connector-cv"
 
 image:
-  repository: docker.internal.starwit-infra.de/anomaly-post-processing
+  repository: docker.internal.starwit-infra.de/aic-connector-cv
   # tag: TAG # .Chart.AppVersion is used by default, but can be overridden here
 
-# This section is used verbatim as the settings.yaml for the anomaly-post-processing service (see settings.template.yaml for options)
+# This section is used verbatim as the settings.yaml for the aic-connector-cv service (see settings.template.yaml for options)
 config:
-  raw_anomalies: False                          # If True, raw anomaly data (frames, metadata) will be added to all outputs
   redis_input:
     host: redis
     port: 6379
@@ -30,13 +29,3 @@ config:
     #   password: PASSWORD
   # local_output:                               # Uncomment to enable local output (do not change the path, it is where the PV is mounted)
   #   path: /anomaly-data
-
-# If this is not set or empty, a default pull secret is created with the credentials from .pullSecret 
-# (and then used), otherwise it is assumed that the secrets exist
-existingPullSecret: ""
-
-# if .existingPullSecret is not set, this is used to create the default secret, otherwise it will be ignored
-pullSecret:
-  registry: docker.internal.starwit-infra.de
-  username: docker
-  password: "" # password to set

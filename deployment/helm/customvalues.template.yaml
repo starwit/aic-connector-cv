@@ -1,6 +1,5 @@
-# This section is used verbatim as the settings.yaml for the anomaly-post-processing service (see settings.template.yaml for options)
+# This section is used verbatim as the settings.yaml for the aic-connector-cv service (see settings.template.yaml for options)
 config:
-  raw_anomalies: False                          # If True, raw anomaly data (frames, metadata) will be added to all outputs
   redis_input:
     host: redis
     port: 6379
@@ -23,9 +22,3 @@ config:
     #   password: PASSWORD
   # local_output:                               # Uncomment to enable local output (do not change the path, it is where the PV is mounted)
   #   path: /anomaly-data
-
-nameOverride: ""
-fullnameOverride: ""
-
-# extraImagePullSecrets:
-#   - name: extra-pull-secret
