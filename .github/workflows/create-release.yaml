@@ -109,3 +109,24 @@ jobs:
           provenance: mode=max
           push: true
           tags: ${{ env.DOCKERHUB_ORG }}/${{ env.IMAGE_NAME }}:${{ env.APP_VERSION }}
+
+  publish_helm:
+    name: "Publish helm chart"
+    needs: create-release
+    runs-on: [self-hosted, linux, X64]
+    
+    steps:
+    - name: get helm
+      uses: azure/setup-helm@v4
+
+    - name: run helm package
+      working-directory: deployment/helm
+      run: |
+        HELM_VERSION=$(cat ../../pyproject.toml | grep "version" | cut -d'=' -f2 | xargs echo -n)
+        helm package . --version $HELM_VERSION --app-version $HELM_VERSION
+
+    - name: run helm push
+      working-directory: deployment/helm
+      run: |
+        HELM_VERSION=$(cat ../../pyproject.toml | grep "version" | cut -d'=' -f2 | xargs echo -n)
+        helm push aic-connector-cv-chart-$HELM_VERSION.tgz oci://registry-1.docker.io/starwitorg

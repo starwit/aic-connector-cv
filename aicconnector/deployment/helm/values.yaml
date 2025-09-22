@@ -1,0 +1,42 @@
+nameOverride: "anomaly-post-processing"
+fullnameOverride: "anomaly-post-processing"
+
+image:
+  repository: docker.internal.starwit-infra.de/anomaly-post-processing
+  # tag: TAG # .Chart.AppVersion is used by default, but can be overridden here
+
+# This section is used verbatim as the settings.yaml for the anomaly-post-processing service (see settings.template.yaml for options)
+config:
+  raw_anomalies: False                          # If True, raw anomaly data (frames, metadata) will be added to all outputs
+  redis_input:
+    host: redis
+    port: 6379
+    stream_ids: 
+      - stream1
+    stream_prefix: anomalydetection
+  http_output:                                  # HTTP output settings (disabled if not defined)
+    target_endpoint: http://HOST:PORT/ai-cockpit/api/decision
+    module_name: MODULE_NAME
+    minio:
+      endpoint: "HOST:PORT"
+      secure: True
+      bucket_name: BUCKET_NAME
+      user: USERNAME
+      password: PASSWORD
+    # auth:                                     # Uncomment to enable authentication
+    #   token_endpoint_url: TOKEN_URL
+    #   client_id: CLIENT_ID
+    #   username: USERNAME
+    #   password: PASSWORD
+  # local_output:                               # Uncomment to enable local output (do not change the path, it is where the PV is mounted)
+  #   path: /anomaly-data
+
+# If this is not set or empty, a default pull secret is created with the credentials from .pullSecret 
+# (and then used), otherwise it is assumed that the secrets exist
+existingPullSecret: ""
+
+# if .existingPullSecret is not set, this is used to create the default secret, otherwise it will be ignored
+pullSecret:
+  registry: docker.internal.starwit-infra.de
+  username: docker
+  password: "" # password to set

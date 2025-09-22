@@ -1,0 +1,72 @@
+
+{{- $imageRepo := required "image repository for aic-connector-cv is required" .image.repository }}
+{{- $imageTag := required "image tag for aic-connector-cv is required" .image.tag }}
+{{- $rootConfig := . }}
+{{- with .settingsYaml -}}
+{{- $instanceName := printf "aic-connector-cv" }}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "fullname" $ }}-{{ $instanceName }}
+  labels:
+    {{- include "labels" $ | nindent 4 }}
+    app.kubernetes.io/component: aic-connector-cv
+spec:
+  selector:
+    matchLabels:
+      {{- include "selectorLabels" $ | nindent 6 }}
+      app.kubernetes.io/component: {{ $instanceName }}
+  template:
+    metadata:
+      annotations:
+        starwit.de/stage: aic-connector-cv
+        starwit.de/config-checksum: {{ include (print $.Template.BasePath "/aic-connector-cv.configmap.yaml") $ | sha256sum }}
+      labels:
+        {{- include "selectorLabels" $ | nindent 8 }}
+        app.kubernetes.io/component: {{ $instanceName }}
+    spec:
+      serviceAccountName: {{ include "serviceAccountName" $ }}
+      securityContext:
+        {{- toYaml $.Values.podSecurityContext | nindent 8 }}
+      initContainers:
+        - name: wait-for-redis
+          image: valkey/valkey:7.2.6-alpine
+          command: ["sh", "-c", "while ! redis-cli -h {{ include "redisServiceName" $ }} ping ; do echo \"$(date -Iseconds) - still waiting for valkey\"; sleep 1; done"]
+      containers:
+        - name: {{ $instanceName }}
+          securityContext:
+            {{- toYaml $.Values.securityContext | nindent 12 }}
+          image: "{{ $imageRepo }}:{{ $imageTag }}"
+          imagePullPolicy: IfNotPresent
+          resources:
+            {{- toYaml $.Values.resources | nindent 12 }}
+          env:
+            - name: REDIS__HOST
+              value: {{ include "redisServiceName" $ }}
+            - name: REDIS__PORT
+              value: {{ include "redisServicePort" $ }}
+          ports:
+            - name: prometheus
+              containerPort: 8000
+          volumeMounts:
+            - name: config
+              mountPath: /code/settings.yaml
+              subPath: settings.yaml
+      volumes:
+        - name: config
+          configMap:
+            name: {{ $instanceName }}-config
+      {{- with $.Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $.Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $.Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+---
+{{- end }}
