@@ -8,7 +8,7 @@ from visionapi.sae_pb2 import SaeMessage
 from uuid import uuid4
 from .config import AicConnectorConfig
 from .httpoutput import HttpOutput
-from aicconnector.storeoutput import (save_file_to_minio, annotate, draw_bonding_boxes_in_frame)
+from aicconnector.storeoutput import (save_file_to_minio, draw_bonding_boxes_in_frame)
 
 
 logging.basicConfig(format='%(asctime)s %(name)-15s %(levelname)-8s %(processName)-10s %(message)s')
