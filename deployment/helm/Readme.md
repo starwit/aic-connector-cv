@@ -1,18 +1,13 @@
-nameOverride: "aic-connector-cv"
-fullnameOverride: "aic-connector-cv"
+Example for customValues.yaml
 
-image:
-  repository: starwitorg/aic-connector-cv
-  # tag: TAG # .Chart.AppVersion is used by default, but can be overridden here
-
-# This section is used verbatim as the settings.yaml for the aic-connector-cv service (see settings.template.yaml for options)
+```yaml
 config:
   redis_input:
     host: redis
     port: 6379
     stream_ids: 
       - stream1
-    stream_prefix: detectionselector
+    stream_prefix: anomalydetection
   http_output:                                  # HTTP output settings (disabled if not defined)
     target_endpoint: http://HOST:PORT/ai-cockpit/api/decision
     module_name: MODULE_NAME
@@ -29,3 +24,5 @@ config:
     #   password: PASSWORD
   # local_output:                               # Uncomment to enable local output (do not change the path, it is where the PV is mounted)
   #   path: /anomaly-data
+
+```
