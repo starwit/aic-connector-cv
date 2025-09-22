@@ -4,7 +4,7 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ include "fullname" $ }}-{{ $instanceName }}
+  name: {{ $instanceName }}
   labels:
     {{- include "labels" $ | nindent 4 }}
     app.kubernetes.io/component: aic-connector-cv
@@ -23,16 +23,12 @@ spec:
         app.kubernetes.io/component: {{ $instanceName }}
     spec:
       serviceAccountName: default
-      securityContext:
-        {{- toYaml $.Values.podSecurityContext | nindent 8 }}
       containers:
         - name: {{ $instanceName }}
           securityContext:
             {{- toYaml $.Values.securityContext | nindent 12 }}
           image: "{{ $imageRepo }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: IfNotPresent
-          resources:
-            {{- toYaml $.Values.resources | nindent 12 }}
           ports:
             - name: prometheus
               containerPort: 8000
