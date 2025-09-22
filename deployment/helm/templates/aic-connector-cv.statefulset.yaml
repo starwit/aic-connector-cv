@@ -25,10 +25,6 @@ spec:
       serviceAccountName: default
       securityContext:
         {{- toYaml $.Values.podSecurityContext | nindent 8 }}
-      initContainers:
-        - name: wait-for-redis
-          image: valkey/valkey:7.2.6-alpine
-          command: ["sh", "-c", "while ! redis-cli -h {{ include "redisServiceName" $ }} ping ; do echo \"$(date -Iseconds) - still waiting for valkey\"; sleep 1; done"]
       containers:
         - name: {{ $instanceName }}
           securityContext:
@@ -37,11 +33,6 @@ spec:
           imagePullPolicy: IfNotPresent
           resources:
             {{- toYaml $.Values.resources | nindent 12 }}
-          env:
-            - name: REDIS__HOST
-              value: {{ include "redisServiceName" $ }}
-            - name: REDIS__PORT
-              value: {{ include "redisServicePort" $ }}
           ports:
             - name: prometheus
               containerPort: 8000

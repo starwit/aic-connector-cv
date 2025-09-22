@@ -51,43 +51,9 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
-Create the name of the service account to use
-*/}}
-{{- define "serviceAccountName" -}}
-{{- include "fullname" . }}
-{{- end }}
-
-{{/*
-Derive redis service name
-*/}}
-{{- define "redisServiceName" -}}
-{{- printf "%s-%s" .Release.Name "redis-master" -}}
-{{- end }}
-
-{{/*
-Derive redis metrics service name
-*/}}
-{{- define "redisMetricsServiceName" -}}
-{{- printf "%s-%s" .Release.Name "redis-metrics" -}}
-{{- end }}
-
-{{/*
-Hard-code Redis service port (for now)
-*/}}
-{{- define "redisServicePort" -}}
-"6379"
-{{- end }}
-
-{{/*
 Derive redis metrics service name
 */}}
 {{- define "nodeExporterServiceName" -}}
 {{- printf "%s-%s" .Release.Name "nodeexporter" -}}
 {{- end }}
 
-{{/*
-Derive prometheus service name
-*/}}
-{{- define "prometheusServiceName" -}}
-{{- printf "%s-%s" .Release.Name "prometheus-server" -}}
-{{- end }}
