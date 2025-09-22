@@ -21,5 +21,3 @@ http_output:                                  # HTTP output settings (disabled i
     endpoint: localhost:9000
     secure: True
     bucket_name: BUCKET_NAME
-# local_output:                               # Local file output settings (disabled if not defined)
-#   path: /tmp/anomalydetection

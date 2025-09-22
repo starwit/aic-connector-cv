@@ -31,16 +31,11 @@ class HttpOutputConfig(BaseModel):
     auth: Optional[AuthConfig] = None
     minio: MinioConfig
 
-class LocalOutputConfig(BaseModel):
-    path: pathlib.Path
-
 class AicConnectorConfig(BaseSettings):
     log_level: LogLevel = LogLevel.WARNING
     redis_input: RedisInputConfig
     http_output: Optional[HttpOutputConfig] = None
     prometheus_port: Annotated[int, Field(ge=1024, le=65536)] = 8000
-    local_output: Optional[LocalOutputConfig] = None    
-
     model_config = SettingsConfigDict(env_nested_delimiter='__')
 
     @classmethod
