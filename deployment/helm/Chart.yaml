@@ -1,5 +1,5 @@
 apiVersion: v2
-name: aic-connector-cv
+name: aic-connector-cv-chart
 description: Helm chart for processing detections for ai cockpit in valkey and save videos to minio
 
 # A chart can be either an 'application' or a 'library' chart.
