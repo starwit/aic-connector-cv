@@ -7,7 +7,7 @@ config:
     port: 6379
     stream_ids: 
       - stream1
-    stream_prefix: anomalydetection
+    stream_prefix: detectionselector
   http_output:                                  # HTTP output settings (disabled if not defined)
     target_endpoint: http://HOST:PORT/ai-cockpit/api/decision
     module_name: MODULE_NAME
