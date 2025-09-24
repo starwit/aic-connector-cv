@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: aic-connector-cv-config
+data:
+  settings.yaml: |
+    {{- toYaml .Values.config | nindent 4 }}

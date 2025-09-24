@@ -1,0 +1,53 @@
+
+{{- $imageRepo := required "image repository for aic-connector-cv is required"  .Values.image.repository }}
+{{- $instanceName := printf "aic-connector-cv" }}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ $instanceName }}
+  labels:
+    {{- include "labels" $ | nindent 4 }}
+    app.kubernetes.io/component: aic-connector-cv
+spec:
+  selector:
+    matchLabels:
+      {{- include "selectorLabels" $ | nindent 6 }}
+      app.kubernetes.io/component: {{ $instanceName }}
+  template:
+    metadata:
+      annotations:
+        starwit.de/stage: aic-connector-cv
+        starwit.de/config-checksum: {{ include (print $.Template.BasePath "/aic-connector-cv.configmap.yaml") $ | sha256sum }}
+      labels:
+        {{- include "selectorLabels" $ | nindent 8 }}
+        app.kubernetes.io/component: {{ $instanceName }}
+    spec:
+      serviceAccountName: default
+      containers:
+        - name: {{ $instanceName }}
+          image: "{{ $imageRepo }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: prometheus
+              containerPort: 8000
+          volumeMounts:
+            - name: config
+              mountPath: /code/settings.yaml
+              subPath: settings.yaml
+      volumes:
+        - name: config
+          configMap:
+            name: {{ $instanceName }}-config
+      {{- with $.Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $.Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $.Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+---

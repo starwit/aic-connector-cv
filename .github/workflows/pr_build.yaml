@@ -33,3 +33,19 @@ jobs:
           poetry config cache-dir /root/.cache/pypoetry
           bash -c "make test"
 
+  checks:
+    name: "Checks"
+    runs-on: [self-hosted, linux, X64]
+
+    steps:
+    - name: get helm
+      uses: azure/setup-helm@v4
+
+    - name: run helm dependency update
+      working-directory: deployment/helm
+      run: helm dep update
+
+    - name: run helm template
+      working-directory: deployment/helm
+      run: helm template .
+
