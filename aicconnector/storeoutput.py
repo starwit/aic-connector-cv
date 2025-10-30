@@ -47,6 +47,11 @@ def draw_bonding_boxes_in_frame(sae_msg: SaeMessage) -> bytes:
     _, encoded_img = cv2.imencode('.jpeg', image)
     return encoded_img.tobytes()
 
+def get_frame_from_sae_message(sae_msg: SaeMessage) -> bytes:
+    frame_data = sae_msg.frame.frame_data_jpeg
+    np_arr = np.frombuffer(frame_data, np.uint8)
+    return np_arr
+
 def _annotate(image, detection: Detection):
     bbox_x1 = int(detection.bounding_box.min_x * image.shape[1])
     bbox_y1 = int(detection.bounding_box.min_y * image.shape[0])

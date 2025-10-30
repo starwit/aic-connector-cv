@@ -8,7 +8,7 @@ from visionapi.sae_pb2 import SaeMessage
 from uuid import uuid4
 from .config import AicConnectorConfig
 from .httpoutput import HttpOutput
-from aicconnector.storeoutput import (save_file_to_minio, draw_bonding_boxes_in_frame)
+from aicconnector.storeoutput import (get_frame_from_sae_message, save_file_to_minio, draw_bonding_boxes_in_frame)
 
 
 logging.basicConfig(format='%(asctime)s %(name)-15s %(levelname)-8s %(processName)-10s %(message)s')
@@ -36,6 +36,7 @@ class AicConnector:
         sae_msg: SaeMessage = self._unpack_proto(input_proto)
         sae_id = f'{datetime.now().strftime("%Y%m%d_%H%M%S")}_{uuid4().hex[:6]}'
         self._save_sae_media(sae_msg, sae_id)
+        self._save_annotated_sae_media(sae_msg, sae_id)
         if self.http_output:
             self.http_output.send_decision_message(sae_msg, sae_id)
         
@@ -51,10 +52,19 @@ class AicConnector:
         return sae_msg.SerializeToString()
 
     def _save_sae_media(self, input_msg: SaeMessage, sae_id: str):
-        data = draw_bonding_boxes_in_frame(input_msg)
+        data = get_frame_from_sae_message(input_msg)
         try:
-            object_name = f"{sae_id}/annotated.jpg"
+            object_name = f"{sae_id}/original.jpg"
             save_file_to_minio(self.config.http_output.minio, data, object_name)
         except Exception as e:
-            logger.error(f"Error saving decisions: {e}")
+            logger.error(f"Error saving image for decision: {e}")
+        return
+        
+    def _save_annotated_sae_media(self, input_msg: SaeMessage, sae_id: str):
+        data_annotated = draw_bonding_boxes_in_frame(input_msg)
+        try:
+            object_name = f"{sae_id}/annotated.jpg"
+            save_file_to_minio(self.config.http_output.minio, data_annotated, object_name)
+        except Exception as e:
+            logger.error(f"Error saving annotated image for decision: {e}")
         return
