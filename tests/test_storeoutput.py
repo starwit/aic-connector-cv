@@ -120,7 +120,7 @@ def test_draw_bounding_boxes_in_frame_calls_annotate_and_returns_encoded_bytes(m
     assert len(called) == 2
     assert called[0][1] is det1 and called[1][1] is det2
 
-def test_draw_bonding_boxes_in_frame_handles_no_detections(monkeypatch):
+def test_draw_bounding_boxes_in_frame_handles_no_detections(monkeypatch):
     data = b'\x11\x22'
     sae = _SaeMsg(data)
     sae.detections = []
