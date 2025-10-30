@@ -114,7 +114,7 @@ def test_draw_bounding_boxes_in_frame_calls_annotate_and_returns_encoded_bytes(m
         return True, encoded_array
     monkeypatch.setattr(storeoutput.cv2, "imencode", fake_imencode)
 
-    result = storeoutput.draw_bonding_boxes_in_frame(sae)
+    result = storeoutput.draw_bounding_boxes_in_frame(sae)
 
     assert result == encoded_bytes
     assert len(called) == 2
@@ -138,7 +138,7 @@ def test_draw_bounding_boxes_in_frame_handles_no_detections(monkeypatch):
     encoded_bytes = b'NO_DET'
     monkeypatch.setattr(storeoutput.cv2, "imencode", lambda ext, image: (True, np.frombuffer(encoded_bytes, np.uint8)))
 
-    result = storeoutput.draw_bonding_boxes_in_frame(sae)
+    result = storeoutput.draw_bounding_boxes_in_frame(sae)
 
     assert result == encoded_bytes
     assert annotated_called is False

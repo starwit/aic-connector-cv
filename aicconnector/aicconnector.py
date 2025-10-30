@@ -8,7 +8,7 @@ from visionapi.sae_pb2 import SaeMessage
 from uuid import uuid4
 from .config import AicConnectorConfig
 from .httpoutput import HttpOutput
-from aicconnector.storeoutput import (get_frame_from_sae_message, save_file_to_minio, draw_bonding_boxes_in_frame)
+from aicconnector.storeoutput import (get_frame_from_sae_message, save_file_to_minio, draw_bounding_boxes_in_frame)
 
 
 logging.basicConfig(format='%(asctime)s %(name)-15s %(levelname)-8s %(processName)-10s %(message)s')
@@ -61,7 +61,7 @@ class AicConnector:
         return
         
     def _save_annotated_sae_media(self, input_msg: SaeMessage, sae_id: str):
-        data_annotated = draw_bonding_boxes_in_frame(input_msg)
+        data_annotated = draw_bounding_boxes_in_frame(input_msg)
         try:
             object_name = f"{sae_id}/annotated.jpg"
             save_file_to_minio(self.config.http_output.minio, data_annotated, object_name)
