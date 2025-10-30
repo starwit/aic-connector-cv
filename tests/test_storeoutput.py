@@ -83,7 +83,7 @@ def test__annotate_includes_object_id_in_label_when_present(monkeypatch):
     expected_label = f'ID {expected_id} - {detection.class_id} - {round(detection.confidence, 2)}'
     assert captured.get('text') == expected_label
     
-def test_draw_bonding_boxes_in_frame_calls_annotate_and_returns_encoded_bytes(monkeypatch):
+def test_draw_bounding_boxes_in_frame_calls_annotate_and_returns_encoded_bytes(monkeypatch):
     data = b'\x00\x01\x02'
     sae = _SaeMsg(data)
     det1 = _Detection(_BBox(0.1, 0.1, 0.2, 0.2), "car", 0.5)
