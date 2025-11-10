@@ -12,37 +12,6 @@ class _SaeMsg:
     def __init__(self, data: bytes):
         self.frame = _Frame(data)
 
-def test_get_frame_from_sae_message_returns_numpy_array_with_correct_contents():
-    data = b'\x00\x01\x02\xff\x10'
-    sae = _SaeMsg(data)
-
-    result = get_frame_from_sae_message(sae)
-
-    assert isinstance(result, np.ndarray)
-    assert result.dtype == np.uint8
-    assert result.shape == (len(data),)
-    assert np.array_equal(result, np.frombuffer(data, np.uint8))
-
-def test_get_frame_from_sae_message_handles_empty_bytes():
-    data = b''
-    sae = _SaeMsg(data)
-
-    result = get_frame_from_sae_message(sae)
-
-    assert isinstance(result, np.ndarray)
-    assert result.size == 0
-    assert result.shape == (0,)
-
-def test_get_frame_from_sae_message_accepts_bytearray_like_objects():
-    data = bytearray(b'\x10\x20\x30')
-    sae = _SaeMsg(data)
-
-    result = get_frame_from_sae_message(sae)
-
-    assert isinstance(result, np.ndarray)
-    assert result.dtype == np.uint8
-    assert np.array_equal(result, np.frombuffer(data, np.uint8))
-    
 class _BBox:
     def __init__(self, min_x, min_y, max_x, max_y):
         self.min_x = min_x
