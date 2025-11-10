@@ -1,6 +1,4 @@
 import numpy as np
-import pytest
-from aicconnector.storeoutput import get_frame_from_sae_message
 from aicconnector import storeoutput
 from aicconnector.storeoutput import _annotate
 

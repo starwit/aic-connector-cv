@@ -8,7 +8,7 @@ from visionapi.sae_pb2 import SaeMessage
 from uuid import uuid4
 from .config import AicConnectorConfig
 from .httpoutput import HttpOutput
-from aicconnector.storeoutput import (get_frame_from_sae_message, save_file_to_minio, draw_bounding_boxes_in_frame)
+from aicconnector.storeoutput import (save_file_to_minio, draw_bounding_boxes_in_frame)
 
 
 logging.basicConfig(format='%(asctime)s %(name)-15s %(levelname)-8s %(processName)-10s %(message)s')
@@ -52,7 +52,7 @@ class AicConnector:
         return sae_msg.SerializeToString()
 
     def _save_sae_media(self, input_msg: SaeMessage, sae_id: str):
-        data = get_frame_from_sae_message(input_msg)
+        data = input_msg.frame.frame_data_jpeg
         try:
             object_name = f"{sae_id}/original.jpg"
             save_file_to_minio(self.config.http_output.minio, data, object_name)
