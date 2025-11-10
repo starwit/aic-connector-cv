@@ -1,4 +1,3 @@
-import pytest
 from aicconnector import aicconnector
 
 def test_main_module_import():

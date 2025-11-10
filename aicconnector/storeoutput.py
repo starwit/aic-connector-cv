@@ -36,7 +36,7 @@ def save_file_to_minio(minio_config: MinioConfig, data: bytes, object_name: str)
     except Exception as e:
         raise IOError(f"Could not upload file {object_name} to MinIO") from e
 
-def draw_bonding_boxes_in_frame(sae_msg: SaeMessage) -> bytes:
+def draw_bounding_boxes_in_frame(sae_msg: SaeMessage) -> bytes:
     frame_data = sae_msg.frame.frame_data_jpeg
     np_arr = np.frombuffer(frame_data, np.uint8)
     image = cv2.imdecode(np_arr, cv2.IMREAD_UNCHANGED)
