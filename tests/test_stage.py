@@ -1,4 +1,3 @@
-import pytest
 from aicconnector import stage
 
 def test_stage_module_import():
