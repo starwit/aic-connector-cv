@@ -17,7 +17,9 @@ DEFAULT_WINDOW_SIZE = (1280, 720)
 
 log = logging.getLogger(__name__)
 
-def save_file_to_minio(minio_config: MinioConfig, data: bytes, object_name: str) -> None:
+def save_file_to_minio(
+    minio_config: MinioConfig, data: bytes, object_name: str, content_type: str = "image/jpeg"
+) -> None:
     client = Minio(
         endpoint=minio_config.endpoint,
         access_key=minio_config.user,
@@ -31,7 +33,7 @@ def save_file_to_minio(minio_config: MinioConfig, data: bytes, object_name: str)
             object_name, 
             data=BytesIO(data),
             length=len(data),
-            content_type="image/jpeg"
+            content_type=content_type
         )
     except Exception as e:
         raise IOError(f"Could not upload file {object_name} to MinIO") from e
