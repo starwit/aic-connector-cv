@@ -33,7 +33,7 @@ class AicConnector:
         return self.get(input_proto)
     
     @GET_DURATION.time()
-    def get(self, input_proto):
+    def get(self, input_proto, stream_id=None):
         sae_msg: SaeMessage = self._unpack_proto(input_proto)
         sae_id = f'{datetime.now().strftime("%Y%m%d_%H%M%S")}_{uuid4().hex[:6]}'
         if not self.http_output:
@@ -45,7 +45,9 @@ class AicConnector:
         except IOError as e:
             logger.error(f"Error saving files for decision: {e}")
             return
-        self.http_output.send_decision_message(sae_msg, sae_id)
+        decision_type_names = self.config.redis_input.decision_type_names
+        decision_type_name = decision_type_names[stream_id] if decision_type_names else None
+        self.http_output.send_decision_message(sae_msg, sae_id, decision_type_name)
         
     @PROTO_DESERIALIZATION_DURATION.time()
     def _unpack_proto(self, sae_message_bytes):

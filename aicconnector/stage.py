@@ -55,4 +55,5 @@ def run_stage():
 
             FRAME_COUNTER.inc()
 
-            aic_connector.get(proto_data)
+            stream_id = stream_key.split(':')[1]
+            aic_connector.get(proto_data, stream_id)

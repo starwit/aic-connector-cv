@@ -1,6 +1,8 @@
 import json
 from unittest.mock import patch
 
+import pytest
+
 from aicconnector import aicconnector
 from aicconnector.aicconnector import AicConnector
 from aicconnector.config import AicConnectorConfig, HttpOutputConfig, MinioConfig, RedisInputConfig
@@ -36,6 +38,15 @@ def test_save_sae_detections_as_json():
         "label": "detector-class",
         "boundingBox": {"minX": 0.125, "minY": 0.25, "maxX": 0.5, "maxY": 0.75},
     }]
+
+
+def test_rejects_partial_decision_type_mapping():
+    with pytest.raises(ValueError, match="Missing decision type names for streams: stream2"):
+        RedisInputConfig(
+            stream_ids=["stream1", "stream2"],
+            stream_prefix="objectdetector",
+            decision_type_names={"stream1": "Periodic sample"},
+        )
 
 
 def test_does_not_send_decision_after_file_upload_failure():

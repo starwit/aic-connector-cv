@@ -1,4 +1,4 @@
-from pydantic import AnyHttpUrl, BaseModel, Field
+from pydantic import AnyHttpUrl, BaseModel, Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from typing_extensions import Annotated
 from visionlib.pipeline.settings import LogLevel, YamlConfigSettingsSource
@@ -17,6 +17,21 @@ class RedisInputConfig(BaseModel):
     port: Annotated[int, Field(ge=1, le=65536)] = 6379
     stream_ids: List[str]
     stream_prefix: str
+    decision_type_names: dict[str, str] = Field(default_factory=dict)
+
+    @model_validator(mode="after")
+    def validate_decision_type_names(self):
+        if self.decision_type_names:
+            missing_streams = [
+                stream_id
+                for stream_id in self.stream_ids
+                if not self.decision_type_names.get(stream_id, "").strip()
+            ]
+            if missing_streams:
+                raise ValueError(
+                    "Missing decision type names for streams: " + ", ".join(missing_streams)
+                )
+        return self
     
 class AuthConfig(BaseModel):
     token_endpoint_url: AnyHttpUrl

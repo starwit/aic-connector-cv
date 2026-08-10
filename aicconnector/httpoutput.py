@@ -3,6 +3,7 @@ import logging
 import requests
 from requests.exceptions import HTTPError, RequestException, Timeout
 from starwit_aic_api.models.decision import Decision
+from starwit_aic_api.models.decision_type import DecisionType
 from starwit_aic_api.models.module import Module
 from visionapi.sae_pb2 import SaeMessage
 
@@ -15,8 +16,8 @@ class HttpOutput:
         self.config = config
         logger.setLevel(log_level.value)
 
-    def send_decision_message(self, sae_msg: SaeMessage, sae_id: str) -> None:
-        decision_payload = self._create_decision_msg(sae_msg, sae_id)
+    def send_decision_message(self, sae_msg: SaeMessage, sae_id: str, decision_type_name=None) -> None:
+        decision_payload = self._create_decision_msg(sae_msg, sae_id, decision_type_name)
 
         logger.debug(f"Sending decision to cockpit: {self.config.target_endpoint}")
         logger.debug(f"Decision payload: {decision_payload}")
@@ -57,12 +58,14 @@ class HttpOutput:
         except Exception as err:
             logger.error(f"An unexpected error occurred: {err}")
 
-    def _create_decision_msg(self, sae_msg: SaeMessage, sae_id: str) -> str:
+    def _create_decision_msg(self, sae_msg: SaeMessage, sae_id: str, decision_type_name=None) -> str:
         output_msg = Decision()
         output_msg.media_url = f'{self.config.minio.bucket_name}/{sae_id}/annotated.jpg'
         output_msg.module = Module()
         output_msg.module.name = self.config.module_name
         output_msg.acquisition_time = sae_msg.frame.timestamp_utc_ms
+        if decision_type_name is not None:
+            output_msg.decision_type = DecisionType(name=decision_type_name)
 
         # Forward camera geo location
         if sae_msg.frame.HasField('camera_location'):

@@ -1,3 +1,4 @@
+import json
 import pytest
 from unittest.mock import MagicMock, patch
 from aicconnector.httpoutput import HttpOutput
@@ -22,12 +23,15 @@ def make_config(auth=False):
         auth_cfg = None
     return HttpOutputConfig(target_endpoint='http://target', timeout=5, module_name='mod', auth=auth_cfg, minio=minio)
 
-def test_create_decision_msg():
+def test_create_decision_msg_with_decision_type():
     config = make_config()
     http_output = HttpOutput(config, LogLevel.INFO)
     msg = DummySaeMessage()
-    result = http_output._create_decision_msg(msg, 'sae_id')
-    assert result is not None
+    result_without_type = http_output._create_decision_msg(msg, 'sae_id')
+    result_with_type = http_output._create_decision_msg(msg, 'sae_id', 'Decision type')
+
+    assert json.loads(result_without_type)['decisionType'] is None
+    assert json.loads(result_with_type)['decisionType']['name'] == 'Decision type'
 
 def test_send_decision_message_no_auth():
     config = make_config()
