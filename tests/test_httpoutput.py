@@ -27,10 +27,8 @@ def test_create_decision_msg_with_decision_type():
     config = make_config()
     http_output = HttpOutput(config, LogLevel.INFO)
     msg = DummySaeMessage()
-    result_without_type = http_output._create_decision_msg(msg, 'sae_id')
     result_with_type = http_output._create_decision_msg(msg, 'sae_id', 'Decision type')
 
-    assert json.loads(result_without_type)['decisionType'] is None
     assert json.loads(result_with_type)['decisionType']['name'] == 'Decision type'
 
 def test_send_decision_message_no_auth():
@@ -40,7 +38,7 @@ def test_send_decision_message_no_auth():
     with patch('aicconnector.httpoutput.requests.post') as mock_post:
         mock_post.return_value.raise_for_status = MagicMock()
         mock_post.return_value.json.return_value = {}
-        http_output.send_decision_message(msg, 'sae_id')
+        http_output.send_decision_message(msg, 'sae_id', 'Decision type')
         mock_post.assert_called()
 
 def test_send_decision_message_with_auth():
@@ -50,7 +48,7 @@ def test_send_decision_message_with_auth():
     with patch('aicconnector.httpoutput.requests.post') as mock_post:
         # First call for token, second for actual post
         mock_post.side_effect = [MagicMock(json=lambda: {'access_token': 'tok'}), MagicMock(raise_for_status=MagicMock())]
-        http_output.send_decision_message(msg, 'sae_id')
+        http_output.send_decision_message(msg, 'sae_id', 'Decision type')
         assert mock_post.call_count == 2
 
 def test_send_decision_message_timeout():
@@ -58,4 +56,4 @@ def test_send_decision_message_timeout():
     http_output = HttpOutput(config, LogLevel.INFO)
     msg = DummySaeMessage()
     with patch('aicconnector.httpoutput.requests.post', side_effect=Exception('Timeout')):
-        http_output.send_decision_message(msg, 'sae_id')
+        http_output.send_decision_message(msg, 'sae_id', 'Decision type')

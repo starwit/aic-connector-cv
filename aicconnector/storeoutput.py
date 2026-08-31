@@ -43,10 +43,9 @@ def draw_bounding_boxes_in_frame(sae_msg: SaeMessage) -> bytes:
     frame_data = sae_msg.frame.frame_data_jpeg
     np_arr = np.frombuffer(frame_data, np.uint8)
     image = cv2.imdecode(np_arr, cv2.IMREAD_UNCHANGED)
-    class_names = dict(sae_msg.model_metadata.class_names)
 
     for detection in sae_msg.detections:
-        _annotate(image, detection, class_names)
+        _annotate(image, detection, sae_msg.model_metadata.class_names)
     
     _, encoded_img = cv2.imencode('.jpeg', image)
     return encoded_img.tobytes()

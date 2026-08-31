@@ -29,11 +29,11 @@ class AicConnector:
         self.isDebug = self.config.log_level.value == 'DEBUG'
         logger.setLevel(self.config.log_level.value)
 
-    def __call__(self, input_proto) -> Any:
-        return self.get(input_proto)
+    def __call__(self, input_proto, decision_type_name) -> Any:
+        return self.get(input_proto, decision_type_name)
     
     @GET_DURATION.time()
-    def get(self, input_proto, stream_id=None):
+    def get(self, input_proto, decision_type_name):
         sae_msg: SaeMessage = self._unpack_proto(input_proto)
         sae_id = f'{datetime.now().strftime("%Y%m%d_%H%M%S")}_{uuid4().hex[:6]}'
         if not self.http_output:
@@ -45,8 +45,6 @@ class AicConnector:
         except IOError as e:
             logger.error(f"Error saving files for decision: {e}")
             return
-        decision_type_names = self.config.redis_input.decision_type_names
-        decision_type_name = decision_type_names[stream_id] if decision_type_names else None
         self.http_output.send_decision_message(sae_msg, sae_id, decision_type_name)
         
     @PROTO_DESERIALIZATION_DURATION.time()
@@ -71,10 +69,9 @@ class AicConnector:
         save_file_to_minio(self.config.http_output.minio, data_annotated, object_name)
 
     def _save_sae_detections(self, input_msg: SaeMessage, sae_id: str):
-        class_names = dict(input_msg.model_metadata.class_names)
         data = json.dumps([
             {
-                "label": class_names[detection.class_id],
+                "label": input_msg.model_metadata.class_names[detection.class_id],
                 "boundingBox": {
                     "minX": detection.bounding_box.min_x,
                     "minY": detection.bounding_box.min_y,

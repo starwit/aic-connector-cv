@@ -1,8 +1,6 @@
 import json
 from unittest.mock import patch
 
-import pytest
-
 from aicconnector import aicconnector
 from aicconnector.aicconnector import AicConnector
 from aicconnector.config import AicConnectorConfig, HttpOutputConfig, MinioConfig, RedisInputConfig
@@ -40,15 +38,6 @@ def test_save_sae_detections_as_json():
     }]
 
 
-def test_rejects_partial_decision_type_mapping():
-    with pytest.raises(ValueError, match="Missing decision type names for streams: stream2"):
-        RedisInputConfig(
-            stream_ids=["stream1", "stream2"],
-            stream_prefix="objectdetector",
-            decision_type_names={"stream1": "Periodic sample"},
-        )
-
-
 def test_does_not_send_decision_after_file_upload_failure():
     minio = MinioConfig(endpoint="minio:9000", user="user", password="pass", bucket_name="bucket", secure=False)
     http_output = HttpOutputConfig(target_endpoint="http://target", module_name="mod", minio=minio)
@@ -61,6 +50,6 @@ def test_does_not_send_decision_after_file_upload_failure():
         patch.object(connector, "_save_annotated_sae_media", side_effect=IOError),
         patch.object(connector.http_output, "send_decision_message") as send_decision_message,
     ):
-        connector.get(msg.SerializeToString())
+        connector.get(msg.SerializeToString(), "Low confidence")
 
     send_decision_message.assert_not_called()

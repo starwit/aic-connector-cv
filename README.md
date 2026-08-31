@@ -29,31 +29,14 @@ This template employs pydantic-settings for configuration handling. On startup, 
 
 The `settings.template.yaml` should always reflect a correct and fully fledged settings structure to use as a starting point for users. 
 
-`redis_input.decision_type_names` optionally maps configured stream IDs to existing AI Cockpit decision type names. When configured, it must contain a non-empty decision type name for every subscribed `stream_id`; keys exclude the Redis stream prefix. Omitting the mapping preserves the existing AI Cockpit default decision type behavior.
+The final segment of each configured Redis stream ID is forwarded unchanged as the AI Cockpit decision type name. For example, `stream1:Low confidence` creates a `Low confidence` decision.
 
 ## MinIO output
 
-When HTTP output is configured, the connector stores three files in one MinIO directory before submitting the Cockpit decision:
-
-- `original.jpg` is the unchanged frame used when creating a CVAT task.
-- `annotated.jpg` contains the review overlay displayed in AI Cockpit.
-- `detections.json` contains the detector labels and normalized bounding boxes that AI Cockpit imports as editable CVAT rectangles.
-
-`detections.json` has the following format. Labels come from `SaeMessage.model_metadata.class_names`, and bounding-box coordinates are normalized to the original image size. No class list is configured in the connector.
-
-```json
-[
-  {
-    "label": "example-class",
-    "boundingBox": {
-      "minX": 0.1,
-      "minY": 0.2,
-      "maxX": 0.3,
-      "maxY": 0.4
-    }
-  }
-]
-```
+Before submitting a Cockpit decision, the connector stores the unchanged frame as
+`original.jpg`, the review overlay as `annotated.jpg`, and the detector labels with
+normalized boxes as `detections.json`. Labels come directly from
+`SaeMessage.model_metadata.class_names`; the connector has no separate class list.
 
 ## Github Workflows and Versioning
 
