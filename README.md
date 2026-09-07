@@ -29,6 +29,33 @@ This template employs pydantic-settings for configuration handling. On startup, 
 
 The `settings.template.yaml` should always reflect a correct and fully fledged settings structure to use as a starting point for users. 
 
+The connector forwards `SaeMessage.sampling_reason` as the AI Cockpit decision type name.
+Redis subscriptions identify source streams only; filter names are configured in the sampler.
+
+## MinIO output
+
+Before submitting a Cockpit decision, the connector stores the unchanged frame as
+`original.jpg`, the review overlay as `annotated.jpg`, and the detector labels with
+normalized boxes as `detections.json`. Labels come directly from
+`SaeMessage.model_metadata.class_names`; the connector has no separate class list.
+
+`detections.json` has the following format. Bounding-box coordinates are normalized
+to the original image size.
+
+```json
+[
+  {
+    "label": "example-class",
+    "boundingBox": {
+      "minX": 0.1,
+      "minY": 0.2,
+      "maxX": 0.3,
+      "maxY": 0.4
+    }
+  }
+]
+```
+
 ## Github Workflows and Versioning
 
 The following Github Actions are available:

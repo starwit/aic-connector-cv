@@ -3,6 +3,7 @@ import logging
 import requests
 from requests.exceptions import HTTPError, RequestException, Timeout
 from starwit_aic_api.models.decision import Decision
+from starwit_aic_api.models.decision_type import DecisionType
 from starwit_aic_api.models.module import Module
 from visionapi.sae_pb2 import SaeMessage
 
@@ -63,6 +64,8 @@ class HttpOutput:
         output_msg.module = Module()
         output_msg.module.name = self.config.module_name
         output_msg.acquisition_time = sae_msg.frame.timestamp_utc_ms
+        if sae_msg.sampling_reason:
+            output_msg.decision_type = DecisionType(name=sae_msg.sampling_reason)
 
         # Forward camera geo location
         if sae_msg.frame.HasField('camera_location'):
