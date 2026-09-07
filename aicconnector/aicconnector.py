@@ -29,11 +29,11 @@ class AicConnector:
         self.isDebug = self.config.log_level.value == 'DEBUG'
         logger.setLevel(self.config.log_level.value)
 
-    def __call__(self, input_proto, decision_type_name) -> Any:
-        return self.get(input_proto, decision_type_name)
+    def __call__(self, input_proto) -> Any:
+        return self.get(input_proto)
     
     @GET_DURATION.time()
-    def get(self, input_proto, decision_type_name):
+    def get(self, input_proto):
         sae_msg: SaeMessage = self._unpack_proto(input_proto)
         sae_id = f'{datetime.now().strftime("%Y%m%d_%H%M%S")}_{uuid4().hex[:6]}'
         if not self.http_output:
@@ -45,7 +45,7 @@ class AicConnector:
         except IOError as e:
             logger.error(f"Error saving files for decision: {e}")
             return
-        self.http_output.send_decision_message(sae_msg, sae_id, decision_type_name)
+        self.http_output.send_decision_message(sae_msg, sae_id)
         
     @PROTO_DESERIALIZATION_DURATION.time()
     def _unpack_proto(self, sae_message_bytes):
@@ -69,17 +69,18 @@ class AicConnector:
         save_file_to_minio(self.config.http_output.minio, data_annotated, object_name)
 
     def _save_sae_detections(self, input_msg: SaeMessage, sae_id: str):
-        data = json.dumps([
-            {
+        detections = []
+        for detection in input_msg.detections:
+            bounding_box = detection.bounding_box
+            detections.append({
                 "label": input_msg.model_metadata.class_names[detection.class_id],
                 "boundingBox": {
-                    "minX": detection.bounding_box.min_x,
-                    "minY": detection.bounding_box.min_y,
-                    "maxX": detection.bounding_box.max_x,
-                    "maxY": detection.bounding_box.max_y,
+                    "minX": bounding_box.min_x,
+                    "minY": bounding_box.min_y,
+                    "maxX": bounding_box.max_x,
+                    "maxY": bounding_box.max_y,
                 },
-            }
-            for detection in input_msg.detections
-        ]).encode("utf-8")
+            })
+        data = json.dumps(detections).encode("utf-8")
         object_name = f"{sae_id}/detections.json"
         save_file_to_minio(self.config.http_output.minio, data, object_name, content_type="application/json")

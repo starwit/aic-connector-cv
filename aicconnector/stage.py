@@ -55,5 +55,4 @@ def run_stage():
 
             FRAME_COUNTER.inc()
 
-            decision_type_name = stream_key.rsplit(':', 1)[1]
-            aic_connector.get(proto_data, decision_type_name)
+            aic_connector.get(proto_data)

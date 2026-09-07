@@ -50,6 +50,6 @@ def test_does_not_send_decision_after_file_upload_failure():
         patch.object(connector, "_save_annotated_sae_media", side_effect=IOError),
         patch.object(connector.http_output, "send_decision_message") as send_decision_message,
     ):
-        connector.get(msg.SerializeToString(), "Low confidence")
+        connector.get(msg.SerializeToString())
 
     send_decision_message.assert_not_called()
