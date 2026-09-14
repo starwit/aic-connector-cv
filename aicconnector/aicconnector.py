@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 from pathlib import Path
@@ -37,6 +38,7 @@ class AicConnector:
         sae_id = f'{datetime.now().strftime("%Y%m%d_%H%M%S")}_{uuid4().hex[:6]}'
         self._save_sae_media(sae_msg, sae_id)
         self._save_annotated_sae_media(sae_msg, sae_id)
+        self._save_sae_detections(sae_msg, sae_id)
         if self.http_output:
             self.http_output.send_decision_message(sae_msg, sae_id)
         
@@ -67,4 +69,31 @@ class AicConnector:
             save_file_to_minio(self.config.http_output.minio, data_annotated, object_name)
         except Exception as e:
             logger.error(f"Error saving annotated image for decision: {e}")
+        return
+
+    def _save_sae_detections(self, input_msg: SaeMessage, sae_id: str):
+        detections = [
+            {
+                "label": input_msg.model_metadata.class_names[detection.class_id],
+                "boundingBox": {
+                    "minX": detection.bounding_box.min_x,
+                    "minY": detection.bounding_box.min_y,
+                    "maxX": detection.bounding_box.max_x,
+                    "maxY": detection.bounding_box.max_y,
+                },
+            }
+            for detection in input_msg.detections
+        ]
+        data = json.dumps(detections).encode("utf-8")
+
+        try:
+            object_name = f"{sae_id}/detections.json"
+            save_file_to_minio(
+                self.config.http_output.minio,
+                data,
+                object_name,
+                content_type="application/json",
+            )
+        except Exception as e:
+            logger.error(f"Error saving detections for decision: {e}")
         return
