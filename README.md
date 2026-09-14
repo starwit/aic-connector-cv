@@ -29,6 +29,34 @@ This template employs pydantic-settings for configuration handling. On startup, 
 
 The `settings.template.yaml` should always reflect a correct and fully fledged settings structure to use as a starting point for users. 
 
+The connector sets the Cockpit decision type to the first filter reported by the most recent sampler.
+
+## MinIO output
+
+Before sending a decision to Cockpit, the connector uploads three files to MinIO:
+
+- `original.jpg`: the unchanged frame
+- `annotated.jpg`: the annotated frame
+- `detections.json`: the detected class labels and normalized bounding boxes
+
+Class labels are read from `SaeMessage.model_metadata.class_names`.
+
+The structure of `detections.json` is shown below. Bounding-box coordinates are normalized relative to the original image dimensions.
+
+```json
+[
+  {
+    "label": "example-class",
+    "boundingBox": {
+      "minX": 0.1,
+      "minY": 0.2,
+      "maxX": 0.3,
+      "maxY": 0.4
+    }
+  }
+]
+```
+
 ## Github Workflows and Versioning
 
 The following Github Actions are available:
