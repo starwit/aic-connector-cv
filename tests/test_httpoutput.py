@@ -1,9 +1,12 @@
-import pytest
+import json
 from unittest.mock import MagicMock, patch
+
+import pytest
 from aicconnector.httpoutput import HttpOutput
 from aicconnector.config import HttpOutputConfig, MinioConfig, LogLevel, AuthConfig
 
 class DummySaeMessage:
+    sampling_reasons = []
     class Frame:
         timestamp_utc_ms = 1234567890
         def HasField(self, field):
@@ -22,12 +25,15 @@ def make_config(auth=False):
         auth_cfg = None
     return HttpOutputConfig(target_endpoint='http://target', timeout=5, module_name='mod', auth=auth_cfg, minio=minio)
 
-def test_create_decision_msg():
-    config = make_config()
-    http_output = HttpOutput(config, LogLevel.INFO)
+def test_create_decision_msg_uses_first_sampling_reason():
+    http_output = HttpOutput(make_config(), LogLevel.INFO)
     msg = DummySaeMessage()
-    result = http_output._create_decision_msg(msg, 'sae_id')
-    assert result is not None
+    msg.sampling_reasons = ['first', 'second']
+
+    decision = json.loads(http_output._create_decision_msg(msg, 'sae-id'))
+
+    assert decision['mediaUrl'] == 'bucket/sae-id/annotated.jpg'
+    assert decision['decisionType']['name'] == 'first'
 
 def test_send_decision_message_no_auth():
     config = make_config()

@@ -29,6 +29,8 @@ This template employs pydantic-settings for configuration handling. On startup, 
 
 The `settings.template.yaml` should always reflect a correct and fully fledged settings structure to use as a starting point for users. 
 
+The connector uses the first entry in `SaeMessage.sampling_reasons` as the AI Cockpit decision type.
+
 ## MinIO output
 
 Before submitting a Cockpit decision, the connector stores the unchanged frame as
