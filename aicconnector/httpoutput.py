@@ -64,8 +64,10 @@ class HttpOutput:
         output_msg.module = Module()
         output_msg.module.name = self.config.module_name
         output_msg.acquisition_time = sae_msg.frame.timestamp_utc_ms
-        if sae_msg.sampling_reasons:
-            output_msg.decision_type = DecisionType(name=sae_msg.sampling_reasons[0])
+        if sae_msg.sampling_metadata and sae_msg.sampling_metadata[-1].filter_matches:
+            output_msg.decision_type = DecisionType(
+                name=sae_msg.sampling_metadata[-1].filter_matches[0].name
+            )
 
         # Forward camera geo location
         if sae_msg.frame.HasField('camera_location'):
