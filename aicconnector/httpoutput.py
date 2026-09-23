@@ -65,6 +65,7 @@ class HttpOutput:
         output_msg.module.name = self.config.module_name
         output_msg.acquisition_time = sae_msg.frame.timestamp_utc_ms
         if sae_msg.sampling_metadata and sae_msg.sampling_metadata[-1].filter_matches:
+            # Cockpit supports one decision type, so use the first match from the latest sampler.
             output_msg.decision_type = DecisionType(
                 name=sae_msg.sampling_metadata[-1].filter_matches[0].name
             )
