@@ -1,4 +1,3 @@
-import json
 from unittest.mock import patch
 
 from aicconnector import aicconnector
@@ -32,25 +31,19 @@ def test_main_module_import():
     assert hasattr(aicconnector, "AicConnector") or hasattr(aicconnector, "main")
 
 
-def test_save_sae_detections_as_json():
+def test_save_sae_message_unchanged():
     connector, minio = make_connector()
     msg = SaeMessage()
-    detection = msg.detections.add()
-    detection.class_id = 2
-    detection.bounding_box.min_x = 0.125
-    detection.bounding_box.min_y = 0.25
-    detection.bounding_box.max_x = 0.5
-    detection.bounding_box.max_y = 0.75
+    msg.detections.add().class_id = 2
     msg.model_metadata.class_names[2] = "detector-class"
+    msg.sampling_metadata.add().filter_matches.add().name = "example-filter"
+    sae_bytes = msg.SerializeToString()
 
     with patch("aicconnector.aicconnector.save_file_to_minio") as save_file_to_minio:
-        connector._save_sae_detections(msg, "sae-id")
+        connector._save_sae_message(sae_bytes, "sae-id")
 
     upload = save_file_to_minio.call_args
     assert upload.args[0] == minio
-    assert upload.args[2] == "sae-id/detections.json"
-    assert upload.kwargs["content_type"] == "application/json"
-    assert json.loads(upload.args[1]) == [{
-        "label": "detector-class",
-        "boundingBox": {"minX": 0.125, "minY": 0.25, "maxX": 0.5, "maxY": 0.75},
-    }]
+    assert upload.args[1] == sae_bytes
+    assert upload.args[2] == "sae-id/sae.pb"
+    assert upload.kwargs["content_type"] == "application/x-protobuf"

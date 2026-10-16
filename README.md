@@ -37,25 +37,9 @@ Before sending a decision to Cockpit, the connector uploads three files to MinIO
 
 - `original.jpg`: the unchanged frame
 - `annotated.jpg`: the annotated frame
-- `detections.json`: the detected class labels and normalized bounding boxes
+- `sae.pb`: the received SAE message, unchanged (Vision API `SaeMessage`, binary protobuf)
 
-Class labels are read from `SaeMessage.model_metadata.class_names`.
-
-The structure of `detections.json` is shown below. Bounding-box coordinates are normalized relative to the original image dimensions.
-
-```json
-[
-  {
-    "label": "example-class",
-    "boundingBox": {
-      "minX": 0.1,
-      "minY": 0.2,
-      "maxX": 0.3,
-      "maxY": 0.4
-    }
-  }
-]
-```
+Consumers parse `sae.pb` with the Vision API. Labels come from `model_metadata.class_names`; bounding boxes are normalized to the image size.
 
 ## Github Workflows and Versioning
 
