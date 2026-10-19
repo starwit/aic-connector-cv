@@ -29,6 +29,18 @@ This template employs pydantic-settings for configuration handling. On startup, 
 
 The `settings.template.yaml` should always reflect a correct and fully fledged settings structure to use as a starting point for users. 
 
+The connector sets the Cockpit decision type to the first filter reported by the most recent sampler.
+
+## MinIO output
+
+Before sending a decision to Cockpit, the connector uploads three files to MinIO:
+
+- `original.jpg`: the unchanged frame
+- `annotated.jpg`: the annotated frame
+- `sae.pb`: the received SAE message, unchanged (Vision API `SaeMessage`, binary protobuf)
+
+Consumers parse `sae.pb` with the Vision API. Labels come from `model_metadata.class_names`; bounding boxes are normalized to the image size.
+
 ## Github Workflows and Versioning
 
 The following Github Actions are available:
